@@ -18,7 +18,9 @@ async function searchMoviesByTitle(req, res) {
       return apiResponse.sendSuccess(res, {
         data: {
           payload: jsonResponse.Search,
-          totalCount: jsonResponse.TotalResults || 0,
+          totalCount: jsonResponse.totalResults
+            ? parseInt(jsonResponse.totalResults)
+            : 0,
         },
       });
     }
