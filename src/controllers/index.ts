@@ -64,7 +64,7 @@ export async function searchMoviesByTitle(req: Request, res: Response) {
     const url = `http://${config.movieSourceHost}/?s=${title}&apikey=${config.movieSourceAPIKey}&page=${page}`;
     const response = await rp(url);
     const jsonResponse: OMDBSearchResponse = JSON.parse(response);
-    if (jsonResponse.Response === "True") {
+    if (jsonResponse.Response === OMDBStatusResponse.True) {
       return apiResponse.sendSuccess(res, {
         data: {
           payload: jsonResponse.Search,
@@ -95,7 +95,7 @@ export async function getMovieById(req: Request, res: Response) {
     const url = `http://${config.movieSourceHost}/?i=${movieId}&apikey=${config.movieSourceAPIKey}`;
     const response = await rp(url);
     const jsonResponse: OMDBMovieResponse = JSON.parse(response);
-    if (jsonResponse.Response === "True") {
+    if (jsonResponse.Response === OMDBStatusResponse.True) {
       delete jsonResponse.Response;
       return apiResponse.sendSuccess(res, {
         data: jsonResponse,
