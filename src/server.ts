@@ -1,9 +1,9 @@
-const express = require("express");
+import express from 'express';
 // Reload will auto reload your site.
 // App the Express Webserver
 const app = express();
-const config = require("./server.json");
-const routers = require("./routers");
+import * as config from "./server.json";
+import routers from "./routers";
 
 const rateLimit = require("express-rate-limit");
 const apiLimiter = rateLimit({

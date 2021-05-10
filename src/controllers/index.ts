@@ -1,8 +1,58 @@
-const rp = require("request-promise");
-const config = require("../server.json");
-const { apiResponse } = require("../helpers");
+import rp from "request-promise";
+import { Request, Response } from "express";
+import config from "../server.json";
+import { apiResponse } from "../helpers";
 
-async function searchMoviesByTitle(req, res) {
+enum OMDBStatusResponse {
+  True = "True",
+  False = "False",
+}
+
+interface Rating {
+  Source: string;
+  Value: string;
+}
+
+interface Movie {
+  Title: string;
+  Year?: string;
+  imdbID: string;
+  Type: string;
+  Poster?: string;
+  Rated?: string;
+  Released?: string;
+  Runtime?: string;
+  Genre?: string;
+  Director?: string;
+  Writer?: string;
+  Actors?: string;
+  Plot?: string;
+  Language?: string;
+  Country?: string;
+  Awards?: string;
+  Ratings?: Rating[];
+  Metascore?: string;
+  imdbRating?: string;
+  imdbVotes?: string;
+  DVD?: string;
+  BoxOffice?: string;
+  Production?: string;
+  Website?: string;
+}
+
+interface OMDBSearchResponse {
+  Response: OMDBStatusResponse;
+  Error?: string;
+  Search?: Movie[];
+  totalResults: string;
+}
+
+interface OMDBMovieResponse extends Movie {
+  Response?: OMDBStatusResponse;
+  Error?: string;
+}
+
+export async function searchMoviesByTitle(req: Request, res: Response) {
   try {
     const title = req.query.title;
     const page = req.query.page || 1;
@@ -13,7 +63,7 @@ async function searchMoviesByTitle(req, res) {
     }
     const url = `http://${config.movieSourceHost}/?s=${title}&apikey=${config.movieSourceAPIKey}&page=${page}`;
     const response = await rp(url);
-    const jsonResponse = JSON.parse(response);
+    const jsonResponse: OMDBSearchResponse = JSON.parse(response);
     if (jsonResponse.Response === "True") {
       return apiResponse.sendSuccess(res, {
         data: {
@@ -34,7 +84,7 @@ async function searchMoviesByTitle(req, res) {
   }
 }
 
-async function getMovieById(req, res) {
+export async function getMovieById(req: Request, res: Response) {
   try {
     const movieId = req.params.id;
     if (!movieId) {
@@ -44,7 +94,7 @@ async function getMovieById(req, res) {
     }
     const url = `http://${config.movieSourceHost}/?i=${movieId}&apikey=${config.movieSourceAPIKey}`;
     const response = await rp(url);
-    const jsonResponse = JSON.parse(response);
+    const jsonResponse: OMDBMovieResponse = JSON.parse(response);
     if (jsonResponse.Response === "True") {
       delete jsonResponse.Response;
       return apiResponse.sendSuccess(res, {
@@ -60,8 +110,3 @@ async function getMovieById(req, res) {
     });
   }
 }
-
-module.exports = {
-  searchMoviesByTitle,
-  getMovieById,
-};
